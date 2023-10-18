@@ -45,7 +45,7 @@ async function main() {
 
     //Deploying and minting Token 2
     console.log("Deploying Token2...")
-    const Token2 = await ERC20Factory.deploy("Token 2", "TK2", "18")
+    const Token2 = await ERC20Factory.deploy("Token2", "TK2", "18")
     await Token2.waitForDeployment()
 
     const Token2Symbol = await Token2.symbol()
@@ -106,9 +106,9 @@ async function main() {
         `No. of shares in circulation before adding liquidity is ${await CPAMM.totalSupply()}`,
     )
 
-    await Token1.approve(CPAMM, 500)
-    await Token2.approve(CPAMM, 1000)
-    await CPAMM.addLiquidity(500, 1000)
+    await Token1.approve(CPAMM, 400)
+    await Token2.approve(CPAMM, 200)
+    await CPAMM.addLiquidity(400, 200)
     console.log(
         `No of shares Liquidity Provider has after adding liquidity ${await CPAMM.balanceOf(
             deployer,
@@ -130,7 +130,6 @@ async function main() {
         `For 100 ${Token1Symbol} you will recieve ${swapReturn} of ${Token2Symbol}\n`,
     )
 
-    //Performing Swap
     console.log(
         `OtherAcc balance of ${Token1Symbol} is ${await Token1.balanceOf(
             other,
@@ -146,38 +145,6 @@ async function main() {
     )
     console.log(
         `Reserve of ${Token2Symbol} is ${await CPAMM.reserve1()} before swapping`,
-    )
-    await Token1.connect(other).approve(CPAMM, "100")
-    await CPAMM.connect(other).swap(Token1, "100")
-    console.log("Swapping...")
-    console.log(
-        `OtherAcc balance of ${Token1Symbol} is ${await Token1.balanceOf(
-            other,
-        )}`,
-    )
-    console.log(
-        `OtherAcc balance of ${Token2Symbol} is ${await Token2.balanceOf(
-            other,
-        )}`,
-    )
-    console.log(
-        `Reserve of ${Token1Symbol} is ${await CPAMM.reserve0()} after swapping`,
-    )
-    console.log(
-        `Reserve of ${Token2Symbol} is ${await CPAMM.reserve1()} after swapping\n`,
-    )
-
-    //Removing liquidity
-    await CPAMM.removeLiquidity("707")
-    console.log(
-        `Liquidity Provider balance of ${Token1Symbol} is ${await Token1.balanceOf(
-            deployer,
-        )}`,
-    )
-    console.log(
-        `Liquidity Provider balance of ${Token2Symbol} is ${await Token2.balanceOf(
-            deployer,
-        )}`,
     )
 }
 
