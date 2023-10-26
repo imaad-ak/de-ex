@@ -110,7 +110,7 @@ contract CPAMM {
         if (reserve0 > 0 || reserve1 > 0) {
             require(
                 reserve0 * _amount1 == reserve1 * _amount0,
-                "Added iquidity ratio  is not proportional"
+                "Added liquidity ratio  is not proportional"
             );
         }
 
