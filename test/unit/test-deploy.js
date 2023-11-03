@@ -41,13 +41,34 @@ describe("CPAMM", async function () {
     })
 
     it("Should have zero total supply", async function () {
+        const [deployer, other] = await ethers.getSigners()
+
         const totalShares = await CPAMMObject.totalSupply()
+        const LiquidityProviderShares = await CPAMMObject.balanceOf(deployer)
+
         const expectedValue = "0"
         assert.equal(totalShares.toString(), expectedValue)
+        assert.equal(LiquidityProviderShares.toString(), "0")
     })
 
     beforeEach(async function () {
-        Token1.approve(CPAMMAddress, "100")
-        Token2.approve(CPAMMAddress, "50")
+        await Token1.approve(CPAMMAddress, "1000")
+        await Token2.approve(CPAMMAddress, "500")
+    })
+
+    it("Should be able to add liquidity", async function () {
+        const [deployer, other] = await ethers.getSigners()
+
+        await CPAMMObject.addLiquidity("1000", "500")
+        const Token1Reserve = await CPAMMObject.reserve0()
+        const Token2Reserve = await CPAMMObject.reserve1()
+        const LiquidityProviderShares = await CPAMMObject.balanceOf(deployer)
+        const expectedValue1 = "1000"
+        const expectedValue2 = "500"
+
+        assert.equal(Token1Reserve.toString(), expectedValue1)
+        assert.equal(Token2Reserve.toString(), expectedValue2)
+        assert.isAbove(LiquidityProviderShares, 0)
+        console.log(LiquidityProviderShares)
     })
 })
