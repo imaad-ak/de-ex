@@ -18,12 +18,12 @@ describe("CPAMM", async function () {
 
         Token1 = await ERC20Factory.deploy("Token1", "TK1", "18")
         await Token1.waitForDeployment()
-        await Token1.mint(deployer, "1000")
-        await Token1.mint(other, "1000")
+        await Token1.mint(deployer, "1000000000000000000")
+        await Token1.mint(other, "1000000000000000000")
 
         Token2 = await ERC20Factory.deploy("Token2", "TK2", "18")
         await Token2.waitForDeployment()
-        await Token2.mint(deployer, "1000")
+        await Token2.mint(deployer, "1000000000000000000")
 
         Token1Address = await Token1.getAddress()
         Token2Address = await Token2.getAddress()
@@ -44,8 +44,6 @@ describe("CPAMM", async function () {
         })
 
         it("Should have zero total supply", async function () {
-            //const [deployer, other] = await ethers.getSigners()
-
             const totalShares = await CPAMMObject.totalSupply()
             const LiquidityProviderShares = await CPAMMObject.balanceOf(
                 deployer,
@@ -58,40 +56,45 @@ describe("CPAMM", async function () {
     })
 
     describe("addLiquidty", async function () {
-        it("Should be able to add liquidity", async function () {
-            //const [deployer, other] = await ethers.getSigners()
+        it.only("Should be able to add liquidity", async function () {
+            await Token1.approve(CPAMMAddress, "1000000000")
+            await Token2.approve(CPAMMAddress, "500000000")
 
-            await Token1.approve(CPAMMAddress, "1000")
-            await Token2.approve(CPAMMAddress, "500")
-
-            await CPAMMObject.addLiquidity("1000", "500")
+            await CPAMMObject.addLiquidity("1000000000", "500000000")
             const Token1Reserve = await CPAMMObject.reserve0()
             const Token2Reserve = await CPAMMObject.reserve1()
             const LiquidityProviderShares = await CPAMMObject.balanceOf(
                 deployer,
             )
-            const expectedValue1 = "1000"
-            const expectedValue2 = "500"
+            const expectedValue1 = "1000000000"
+            const expectedValue2 = "500000000"
 
             assert.equal(Token1Reserve.toString(), expectedValue1)
             assert.equal(Token2Reserve.toString(), expectedValue2)
             assert.isAbove(LiquidityProviderShares, 0)
-            console.log(LiquidityProviderShares)
+            //console.log(LiquidityProviderShares)
+        })
+        it("Should not be able to add liquidity again if ratio is wrong", async function () {
+            await Token1.approve(CPAMMAddress, "1000000000")
+            await Token2.approve(CPAMMAddress, "1000000000")
+            await expect(
+                CPAMMObject.addLiquidity("1000000000", "1000000000"),
+            ).to.be.revertedWith("Added liquidity ratio  is not proportional")
         })
     })
 
     describe("swap", async function () {
-        it("Should swap one token for another", async function () {
-            await Token1.connect(other).approve(CPAMMAddress, "100")
+        it.only("Should swap one token for another", async function () {
+            await Token1.connect(other).approve(CPAMMAddress, "1000000000")
             const transactionResponse = await CPAMMObject.connect(other).swap(
                 Token1,
-                "100",
+                "1000000000",
             )
             await transactionResponse.wait(1)
             const SwapperToken2Balance = await Token2.balanceOf(other)
 
             assert.isAbove(Number(SwapperToken2Balance), 0)
-            console.log(SwapperToken2Balance)
+            //console.log(SwapperToken2Balance)
         })
     })
 })

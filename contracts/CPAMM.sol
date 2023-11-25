@@ -131,6 +131,14 @@ contract CPAMM {
         );
     }
 
+    function getLiquidityRatio(
+        address _tokenIn,
+        uint _amountIn
+    ) external view returns (uint _amountOut) {
+        (, , uint reserveIn, uint reserveOut) = tokenFunc(_tokenIn);
+        _amountOut = (reserveOut * _amountIn) / reserveIn;
+    }
+
     function removeLiquidity(
         uint _shares
     ) external returns (uint amount0, uint amount1) {
