@@ -25,8 +25,8 @@ async function main() {
         )}`,
     )
 
-    await Token1.mint(deployer, "1000000000000000000")
-    await Token1.mint(other, "1000000000000000000")
+    await Token1.mint(deployer, "10000")
+    await Token1.mint(other, "5000")
 
     console.log(
         `Deployer balance of ${Token1Symbol} is ${await Token1.balanceOf(
@@ -64,7 +64,7 @@ async function main() {
         )}`,
     )
 
-    await Token2.mint(deployer, "1000000000000000000")
+    await Token2.mint(deployer, "10000")
 
     console.log(
         `Deployer balance  of ${Token2Symbol} is ${await Token2.balanceOf(
@@ -104,9 +104,9 @@ async function main() {
         `No. of shares in circulation before adding liquidity is ${await CPAMM.totalSupply()}`,
     )
 
-    await Token1.approve(CPAMM, 500000000)
-    await Token2.approve(CPAMM, 1000000000)
-    await CPAMM.addLiquidity(500000000, 1000000000)
+    await Token1.approve(CPAMM, 1000)
+    await Token2.approve(CPAMM, 500)
+    await CPAMM.addLiquidity(1000, 500)
     console.log(
         `No of shares Liquidity Provider has after adding liquidity ${await CPAMM.balanceOf(
             deployer,
@@ -122,16 +122,28 @@ async function main() {
         `No. of shares in circulation after adding liquidity is ${await CPAMM.totalSupply()}\n`,
     )
 
-    //Checking Liquidity Ratio
+    /*Checking Liquidity Ratio
     console.log(
-        `With 1000000000 of Token1 , ${await CPAMM.getLiquidityRatio(
+        `With 1000 of Token1 , ${await CPAMM.getLiquidityRatio(
             Token1Address,
-            "1000000000",
+            "1000",
         )} of Token2 need to be added`,
     )
+            */
+    const Token2Liq = await CPAMM.getLiquidityRatio(Token1Address, "1000")
+
+    console.log(
+        `After swapping, the liquidity ratio is; for 1000 of Token 1, you need to add ${Token2Liq} of Token2`,
+    )
+
+    //Adding liquidity again
+    await Token1.approve(CPAMM, 1000)
+    await Token2.approve(CPAMM, 500)
+    await CPAMM.addLiquidity(1000, 500)
+    console.log("Liquidity added again successfully")
 
     //Swap Estimate
-    swapReturn = await CPAMM.connect(other).calcSwapValue(Token1, "100000")
+    swapReturn = await CPAMM.connect(other).calcSwapValue(Token1, "100")
     console.log(
         `For 100000 ${Token1Symbol} you will recieve ${swapReturn} of ${Token2Symbol}\n`,
     )
@@ -153,8 +165,8 @@ async function main() {
     console.log(
         `Reserve of ${Token2Symbol} is ${await CPAMM.reserve1()} before swapping`,
     )
-    await Token1.connect(other).approve(CPAMM, "100000")
-    await CPAMM.connect(other).swap(Token1, "100000")
+    await Token1.connect(other).approve(CPAMM, "100")
+    await CPAMM.connect(other).swap(Token1, "100")
     console.log("Swapping...")
     console.log(
         `OtherAcc balance of ${Token1Symbol} is ${await Token1.balanceOf(
@@ -177,18 +189,6 @@ async function main() {
     console.log(
         `No. of shares in circulation after swap is ${await CPAMM.totalSupply()}\n`,
     )
-
-    const Token2Liq = await CPAMM.getLiquidityRatio(Token1Address, "1000000000")
-
-    console.log(
-        `After swapping, the liquidity ratio is; for 1000000000 of Token 1, you need to add ${Token2Liq} of Token2`,
-    )
-
-    //Adding liquidity again
-    await Token1.approve(CPAMM, 1000000000)
-    await Token2.approve(CPAMM, Token2Liq)
-    await CPAMM.addLiquidity(1000000000, Token2Liq.toString())
-    console.log("Liquidity added again successfully")
 
     /*Removing liquidity
     await CPAMM.removeLiquidity("707")
