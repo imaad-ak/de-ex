@@ -3,6 +3,8 @@ const { ethers, network } = require("hardhat")
 async function main() {
     //Deploying and minting Token 1
     const [deployer, other] = await ethers.getSigners()
+    console.log(deployer)
+    console.log(other)
     const ERC20Factory = await ethers.getContractFactory("ERC20")
     console.log("Deploying Token1...")
     const Token1 = await ERC20Factory.deploy("Token1", "TK1", "18")
@@ -106,9 +108,16 @@ async function main() {
         `No. of shares in circulation before adding liquidity is ${await CPAMM.totalSupply()}`,
     )
 
-    await Token1.approve(CPAMM, 500)
-    await Token2.approve(CPAMM, 1000)
-    await CPAMM.addLiquidity(500, 1000)
+    var transactionResponse
+    transactionResponse = await Token1.approve(CPAMM, 500)
+    transactionResponse.wait(1)
+
+    transactionResponse = await Token2.approve(CPAMM, 1000)
+    transactionResponse.wait(1)
+
+    transactionResponse = await CPAMM.addLiquidity(500, 1000)
+    transactionResponse.wait(1)
+
     console.log(
         `No of shares Liquidity Provider has after adding liquidity ${await CPAMM.balanceOf(
             deployer,
@@ -179,6 +188,18 @@ async function main() {
             deployer,
         )}`,
     )
+}
+
+function listenForTransactionMine(transactionResponse, provider) {
+    console.log(`Mining ${transactionResponse.hash}...`)
+    return new Promise((resolve, reject) => {
+        provider.once(transactionResponse.hash, (transactionReceipt) => {
+            console.log(
+                `Completed with ${transactionReceipt.confirmations()} confirmations`,
+            )
+            resolve()
+        })
+    })
 }
 
 main().catch((error) => {

@@ -19,6 +19,9 @@ module.exports = {
             url: SEPOLIA_RPC_URL,
             accounts: [PRIVATE_KEY1, PRIVATE_KEY2],
             chainId: 11155111,
+            allowUnlimitedContractSize: true,
+            gas: 2100000, //units of gas you are willing to pay, aka gas limit
+            gasPrice: 8000000000, //gas is typically in units of gwei, but you must enter it as wei here
         },
     },
     solidity: "0.8.18",

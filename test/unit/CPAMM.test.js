@@ -1,4 +1,4 @@
-const { ethers } = require("hardhat")
+const { ethers, network } = require("hardhat")
 const { expect, assert } = require("chai")
 
 describe("CPAMM", async function () {
@@ -56,7 +56,7 @@ describe("CPAMM", async function () {
     })
 
     describe("addLiquidty", async function () {
-        it.only("Should be able to add liquidity", async function () {
+        it("Should be able to add liquidity", async function () {
             await Token1.approve(CPAMMAddress, "1000000000")
             await Token2.approve(CPAMMAddress, "500000000")
 
@@ -72,7 +72,7 @@ describe("CPAMM", async function () {
             assert.equal(Token1Reserve.toString(), expectedValue1)
             assert.equal(Token2Reserve.toString(), expectedValue2)
             assert.isAbove(LiquidityProviderShares, 0)
-            //console.log(LiquidityProviderShares)
+            console.log(LiquidityProviderShares)
         })
         it("Should not be able to add liquidity again if ratio is wrong", async function () {
             await Token1.approve(CPAMMAddress, "1000000000")
@@ -84,7 +84,7 @@ describe("CPAMM", async function () {
     })
 
     describe("swap", async function () {
-        it.only("Should swap one token for another", async function () {
+        it("Should swap one token for another", async function () {
             await Token1.connect(other).approve(CPAMMAddress, "1000000000")
             const transactionResponse = await CPAMMObject.connect(other).swap(
                 Token1,
@@ -95,6 +95,12 @@ describe("CPAMM", async function () {
 
             assert.isAbove(Number(SwapperToken2Balance), 0)
             //console.log(SwapperToken2Balance)
+        })
+    })
+
+    describe("remove liqudity", async function () {
+        it("Should be able to remove liquidity", async function () {
+            await CPAMMObject.removeLiquidity("707106781")
         })
     })
 })
