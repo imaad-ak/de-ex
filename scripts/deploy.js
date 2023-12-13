@@ -1,6 +1,8 @@
 const { ethers, network } = require("hardhat")
 
 async function main() {
+    var transactionResponse
+
     //Deploying and minting Token 1
     const [deployer, other] = await ethers.getSigners()
     console.log(deployer)
@@ -29,7 +31,8 @@ async function main() {
     )
 
     await Token1.mint(deployer, "1000")
-    await Token1.mint(other, "1000")
+    transactionResponse = await Token1.mint(other, "1000")
+    var transactionReceipt = await transactionResponse.wait(1)
 
     console.log(
         `Deployer balance of ${Token1Symbol} is ${await Token1.balanceOf(
@@ -68,7 +71,8 @@ async function main() {
         )}`,
     )
 
-    await Token2.mint(deployer, "1000")
+    transactionResponse = await Token2.mint(deployer, "1000")
+    transactionReceipt = await transactionResponse.wait(1)
 
     console.log(
         `Deployer balance  of ${Token2Symbol} is ${await Token2.balanceOf(
@@ -108,15 +112,14 @@ async function main() {
         `No. of shares in circulation before adding liquidity is ${await CPAMM.totalSupply()}`,
     )
 
-    var transactionResponse
     transactionResponse = await Token1.approve(CPAMM, 500)
-    transactionResponse.wait(1)
+    transactionReceipt = await transactionResponse.wait(1)
 
     transactionResponse = await Token2.approve(CPAMM, 1000)
-    transactionResponse.wait(1)
+    transactionReceipt = await transactionResponse.wait(1)
 
     transactionResponse = await CPAMM.addLiquidity(500, 1000)
-    transactionResponse.wait(1)
+    transactionReceipt = await transactionResponse.wait(1)
 
     console.log(
         `No of shares Liquidity Provider has after adding liquidity ${await CPAMM.balanceOf(
@@ -156,8 +159,12 @@ async function main() {
     console.log(
         `Reserve of ${Token2Symbol} is ${await CPAMM.reserve1()} before swapping`,
     )
-    await Token1.connect(other).approve(CPAMM, "100")
-    await CPAMM.connect(other).swap(Token1, "100")
+    transactionResponse = await Token1.connect(other).approve(CPAMM, "100")
+    transactionReceipt = await transactionResponse.wait(1)
+
+    transactionResponse = await CPAMM.connect(other).swap(Token1, "100")
+    transactionReceipt = await transactionResponse.wait(1)
+
     console.log("Swapping...")
     console.log(
         `OtherAcc balance of ${Token1Symbol} is ${await Token1.balanceOf(
@@ -177,7 +184,8 @@ async function main() {
     )
 
     //Removing liquidity
-    await CPAMM.removeLiquidity("707")
+    transactionResponse = await CPAMM.removeLiquidity("707")
+    transactionReceipt = await transactionResponse.wait(1)
     console.log(
         `Liquidity Provider balance of ${Token1Symbol} is ${await Token1.balanceOf(
             deployer,
